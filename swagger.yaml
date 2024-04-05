@@ -110,6 +110,88 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
+          /user/transactions:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User transactions API
+      description: Return all user's transactions for the ongoing month, grouped by account.
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 'User transactions retrieved successfully'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserAccount'
+        '400':
+          description: Invalid fields
+        '500':
+          description: Internal Server Error
+  /user/transactions/{id}:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User transaction API
+      description: Return user's transaction details for given `id`
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+        - in: path
+          name: id
+          required: true
+          type: number
+      responses:
+        '200':
+          description: 'User transaction retrieved successfully'
+          schema:
+            $ref: '#/definitions/UserTransaction'
+        '400':
+          description: Invalid fields
+        '500':
+          description: Internal Server Error
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User transaction API
+      description: Update user's transaction details for given `id`
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+        - in: path
+          name: id
+          required: true
+          type: number
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/UserTransaction'
+      responses:
+        '200':
+          description: 'User transaction updated successfully'
+          schema:
+            $ref: '#/definitions/UserTransaction'
+        '400':
+          description: Invalid fields
+        '500':
+          description: Internal Server Error
 securityDefinitions:
   Bearer:
     type: apiKey
@@ -164,3 +246,32 @@ definitions:
         type: string
       lastName:
         type: string
+  UserTransaction:
+    type: object
+    properties:
+      date:
+        type: string
+      description:
+        type: string
+      amount:
+        type: number
+      balance:
+        type: number
+      category:
+        type: string
+      notes:
+        type: string
+      type:
+        type: string
+        # enum:
+        #   - Electronic
+        #   - Autre
+  UserAccount:
+    type: object
+    properties:
+      name:
+        type: string
+      transactions:
+        type: array
+        items:
+          $ref: '#/definitions/UserTransaction'
