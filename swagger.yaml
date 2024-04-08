@@ -135,6 +135,31 @@ paths:
           description: Invalid fields
         '500':
           description: Internal Server Error
+  /user/transactions:
+    get:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User transactions API
+      description: Return all user's transactions for the ongoing month, grouped by account.
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 'User transactions retrieved successfully'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserAccount'
+        '400':
+          description: Invalid fields
+        '500':
+          description: Internal Server Error
   /user/transactions/{id}:
     get:
       security:
