@@ -59,7 +59,7 @@ export const SigninPage = () => {
 
             {error && <span className='error'> {error}</span>}
 
-            <Cta label='Sign In' />
+            <Cta label='Sign In' disabled={!isSubmittable} />
           </form>
         </section>
       </main>

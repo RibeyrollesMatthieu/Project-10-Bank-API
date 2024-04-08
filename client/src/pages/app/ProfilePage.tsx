@@ -46,7 +46,7 @@ export const ProfilePage = () => {
   }, []);
 
   const isSubmittable = useMemo(() => {
-    return userToken && newFirstname?.trim().length && newLastName?.trim().length;
+    return userToken && (newFirstname?.trim().length || newLastName?.trim().length);
   }, [newFirstname, newLastName, userToken]);
 
   const handleEditSubmit = useCallback(
@@ -57,12 +57,23 @@ export const ProfilePage = () => {
       }
 
       dispatch(
-        editProfile({ token: userToken!, firstName: newFirstname!, lastName: newLastName! })
+        editProfile({
+          token: userToken!,
+          firstName: newFirstname ?? (userInfo?.firstName as string),
+          lastName: newLastName ?? (userInfo?.lastName as string),
+        })
       );
       setIsEditing(false);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch, isSubmittable]
+    [
+      dispatch,
+      isSubmittable,
+      newFirstname,
+      newLastName,
+      userInfo?.firstName,
+      userInfo?.lastName,
+      userToken,
+    ]
   );
 
   if (loading || !userInfo) return <></>;
@@ -91,8 +102,8 @@ export const ProfilePage = () => {
 
       <h2 className='sr-only'>Accounts</h2>
 
-      {accounts.map((account) => (
-        <Account {...account} />
+      {accounts.map((account, index) => (
+        <Account {...account} key={index} />
       ))}
     </>
   );
