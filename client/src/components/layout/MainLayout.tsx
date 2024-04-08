@@ -1,3 +1,4 @@
+import { Footer } from '@components/layout/Footer';
 import { Navbar } from '@components/layout/Navbar';
 import { getProfile } from '@redux/actions/auth/getProfile';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -25,9 +26,7 @@ export const MainLayout = () => {
         <Outlet />
       </main>
 
-      <footer className='footer'>
-        <p className='footer-text'>Copyright 2020 Argent Bank</p>
-      </footer>
+      <Footer />
     </>
   );
 };

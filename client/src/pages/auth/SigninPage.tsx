@@ -1,3 +1,4 @@
+import { Cta } from '@components/standalone/Cta';
 import { Input } from '@components/standalone/Input';
 import { signinUser } from '@redux/actions/auth/signin';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
@@ -10,7 +11,7 @@ export const SigninPage = () => {
   const [password, setPassword] = useState<string>('');
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   /* Redux */
-  const { success } = useAppSelector((state) => state.auth);
+  const { success, error } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   /* Router */
   const navigate = useNavigate();
@@ -49,13 +50,16 @@ export const SigninPage = () => {
             <Input type='email' label='Email' value={email} setValue={setEmail} />
             <Input type='password' label='Password' value={password} setValue={setPassword} />
             <Input
+              isInline
               type='checkbox'
               label='Remember me'
               checked={rememberMe}
               setValue={setRememberMe}
             />
 
-            <button className='sign-in-button'>Sign In</button>
+            {error && <span className='error'> {error}</span>}
+
+            <Cta label='Sign In' />
           </form>
         </section>
       </main>

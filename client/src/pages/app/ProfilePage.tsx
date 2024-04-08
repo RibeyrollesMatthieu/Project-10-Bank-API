@@ -1,17 +1,39 @@
+import { Account } from '@components/standalone/Account';
+import { Cta } from '@components/standalone/Cta';
 import { Input } from '@components/standalone/Input';
 import { editProfile } from '@redux/actions/auth/editProfile';
 import { useAppDispatch, useAppSelector } from '@redux/hooks';
-import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const ProfilePage = () => {
-  const { success, loading, userInfo } = useAppSelector((state) => state.auth);
+  const { success, loading, userInfo, userToken } = useAppSelector((state) => state.auth);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [accounts, setAccounts] = useState<
+    { name: string; display_balance: string; isCurrent?: boolean }[]
+  >([]);
   const [newFirstname, setNewFirstname] = useState<string>();
   const [newLastName, setNewLastName] = useState<string>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { userToken } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    setAccounts([
+      {
+        name: 'Argent Bank Checking (x8349)',
+        display_balance: '$2,082.79',
+      },
+      {
+        name: 'Argent Bank Savings (x6712)',
+        display_balance: '$10,928.42',
+      },
+      {
+        name: 'Argent Bank Credit Card (x8349)',
+        display_balance: '$184.30',
+        isCurrent: true,
+      },
+    ]);
+  }, []);
 
   useEffect(() => {
     if (!success) navigate('/signin');
@@ -23,22 +45,24 @@ export const ProfilePage = () => {
     setNewLastName(undefined);
   }, []);
 
+  const isSubmittable = useMemo(() => {
+    return userToken && newFirstname?.trim().length && newLastName?.trim().length;
+  }, [newFirstname, newLastName, userToken]);
+
   const handleEditSubmit = useCallback(
     (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (
-        !userToken ||
-        !newFirstname ||
-        newFirstname.trim().length === 0 ||
-        !newLastName ||
-        newLastName.trim().length === 0
-      ) {
+      if (!isSubmittable) {
         return;
       }
 
-      dispatch(editProfile({ token: userToken, firstName: newFirstname, lastName: newLastName }));
+      dispatch(
+        editProfile({ token: userToken!, firstName: newFirstname!, lastName: newLastName! })
+      );
+      setIsEditing(false);
     },
-    [dispatch, newFirstname, newLastName, userToken]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dispatch, isSubmittable]
   );
 
   if (loading || !userInfo) return <></>;
@@ -52,52 +76,24 @@ export const ProfilePage = () => {
           {`${userInfo.firstName} ${userInfo.lastName}!`}
         </h1>
         {!isEditing && (
-          <button className='edit-button' onClick={() => setIsEditing(true)}>
-            Edit Name
-          </button>
+          <Cta onClick={() => setIsEditing(true)} label='Edit Name' className='edit-button' />
         )}
       </div>
 
       {isEditing && (
         <form className='edit-form' onSubmit={handleEditSubmit}>
-          <Input label='Firstname' setValue={setNewFirstname} />
-          <Input label='Lastname' setValue={setNewLastName} />
-          <button type='submit'>Save</button>
-          <button onClick={resetEditing}>Cancel</button>
+          <Input label='Firstname' setValue={setNewFirstname} placeholder={userInfo.firstName} />
+          <Input label='Lastname' setValue={setNewLastName} placeholder={userInfo.lastName} />
+          <Cta label='Save' type='submit' color='white' disabled={!isSubmittable} />
+          <Cta label='Cancel' onClick={resetEditing} color='white' />
         </form>
       )}
 
       <h2 className='sr-only'>Accounts</h2>
-      <section className='account'>
-        <div className='account-content-wrapper'>
-          <h3 className='account-title'>Argent Bank Checking (x8349)</h3>
-          <p className='account-amount'>$2,082.79</p>
-          <p className='account-amount-description'>Available Balance</p>
-        </div>
-        <div className='account-content-wrapper cta'>
-          <button className='transaction-button'>View transactions</button>
-        </div>
-      </section>
-      <section className='account'>
-        <div className='account-content-wrapper'>
-          <h3 className='account-title'>Argent Bank Savings (x6712)</h3>
-          <p className='account-amount'>$10,928.42</p>
-          <p className='account-amount-description'>Available Balance</p>
-        </div>
-        <div className='account-content-wrapper cta'>
-          <button className='transaction-button'>View transactions</button>
-        </div>
-      </section>
-      <section className='account'>
-        <div className='account-content-wrapper'>
-          <h3 className='account-title'>Argent Bank Credit Card (x8349)</h3>
-          <p className='account-amount'>$184.30</p>
-          <p className='account-amount-description'>Current Balance</p>
-        </div>
-        <div className='account-content-wrapper cta'>
-          <button className='transaction-button'>View transactions</button>
-        </div>
-      </section>
+
+      {accounts.map((account) => (
+        <Account {...account} />
+      ))}
     </>
   );
 };

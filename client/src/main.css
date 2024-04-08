@@ -178,14 +178,6 @@ body {
   font-size: 5rem;
 }
 
-.input-remember {
-  display: flex;
-}
-
-.input-remember label {
-  margin-left: 0.25rem;
-}
-
 .input-wrapper {
   display: flex;
   flex-direction: column;
@@ -208,6 +200,13 @@ body {
 .input-wrapper input {
   padding: 5px;
   font-size: 1.2rem;
+}
+
+.input-wrapper--inline {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
 }
 
 .footer {
@@ -259,12 +258,17 @@ body {
   flex: 1;
 }
 
+.input-wrapper:has(input[type='checkbox']) label,
+.input-wrapper:has(input[type='checkbox']) input {
+  cursor: pointer;
+}
+
 .edit-button {
-  border-color: #00bc77;
-  background-color: #00bc77;
   color: #fff;
   font-weight: bold;
   padding: 10px;
+  width: fit-content !important;
+  margin-inline: auto;
 }
 
 .edit-form {
@@ -281,9 +285,7 @@ body {
     padding: 8px;
     font-size: 1.1rem;
     font-weight: bold;
-    border-color: #00bc77;
-    background-color: #fff;
-    color: #00bc77;
+    margin-top: 0;
   }
 }
 
@@ -292,7 +294,7 @@ body {
   margin-bottom: 2rem;
 }
 
-.transaction-button {
+.cta {
   display: block;
   width: 100%;
   padding: 8px;
@@ -302,6 +304,22 @@ body {
   border-color: #00bc77;
   background-color: #00bc77;
   color: #fff;
+  cursor: pointer;
+}
+
+.cta--white {
+  border-color: #00bc77;
+  background-color: #fff;
+  color: #00bc77;
+}
+
+.cta:disabled {
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+  font-size: 0.8em;
 }
 
 @media (min-width: 720px) {
@@ -309,11 +327,11 @@ body {
     flex-direction: row;
   }
 
-  .account-content-wrapper.cta {
+  .account-content-wrapper.cta-container {
     flex: 0;
   }
 
-  .transaction-button {
+  .account-content-wrapper .cta {
     width: 200px;
   }
 
